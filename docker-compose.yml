@@ -1,0 +1,18 @@
+services:
+  playwright:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    networks:
+      - ai_test_network
+
+networks:
+  ai_test_network:
+    driver: bridge
+
+volumes:
+  playwright_cache:

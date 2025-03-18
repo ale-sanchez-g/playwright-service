@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: Playwright Testing Service
+  version: 0.0.1
+  description: |
+    A web automation service powered by Playwright that enables programmatic execution of browser-based test flows.
+    
+    ## Key Features
+    - **Test Execution**: Run structured test plans against any website with detailed results
+    - **Element Interaction**: Click, hover, type, scroll, and check element visibility
+    - **Navigation**: Visit URLs and inspect page structure and elements
+    - **Recording**: Capture screenshots and videos during test execution
+    - **Wait Conditions**: Support for timeouts and page load states
+    
+    This service provides a RESTful API to automate browser interactions for testing, monitoring, 
+    and data extraction purposes without requiring direct browser access or Playwright installation.
+    
+    Use cases include:
+    - Automated UI testing
+    - Website monitoring
+    - Content verification
+    - Data extraction
+    - Visual regression testing
+paths:
+  /:
+    get:
+      summary: Ensure the service is running
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /execute:
+    post:
+      summary: Execute a test plan on a website using Playwright
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestPlan'
+      responses:
+        '200':
+          description: Test execution results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  steps:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StepResult'
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                    nullable: true
+                  screenshots:
+                    type: array
+                    items:
+                      type: string
+                  video:
+                    type: string
+                    nullable: true
+        '500':
+          description: Test execution failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+  /navigate:
+    post:
+      summary: Navigate to a URL and return a map of all elements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NavigateRequest'
+      responses:
+        '200':
+          description: Navigation results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  elements:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tag:
+                          type: string
+                        class:
+                          type: string
+                        id:
+                          type: string
+                        text:
+                          type: string
+        '500':
+          description: Navigation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+components:
+  schemas:
+    TestPlan:
+      type: object
+      properties:
+        test_plan:
+          type: object
+          additionalProperties: true
+        url:
+          type: string
+        record_video:
+          type: boolean
+          default: true
+    NavigateRequest:
+      type: object
+      properties:
+        url:
+          type: string
+    StepResult:
+      type: object
+      properties:
+        step:
+          type: string
+        success:
+          type: boolean
+        details:
+          type: object
+          additionalProperties: true

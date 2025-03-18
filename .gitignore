@@ -172,3 +172,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# App specific
+*.png
+*.jpg
+*.jpeg
+static/videos/*.*
+pwservice/
