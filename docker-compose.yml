@@ -7,7 +7,6 @@ services:
       - "8000:8000"
     volumes:
       - ./:/app
-      - playwright_cache:/ms-playwright
     networks:
       - ai_test_network
 

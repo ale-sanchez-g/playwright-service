@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.50.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.51.0-jammy
 
 WORKDIR /app
 
@@ -16,6 +16,12 @@ RUN apt-get update && apt-get install -y \
 # Copy your application code
 COPY . .
 
-RUN playwright install
+# Pin the exact Playwright version to match the Docker image
+RUN pip install playwright==1.51.0
+RUN playwright install chromium
+RUN playwright install-deps
+
+# Make sure directory structure exists
+RUN mkdir -p /ms-playwright/chromium_headless_shell-1161/chrome-linux/
 
 CMD ["python", "service.py"]

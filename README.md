@@ -1,6 +1,8 @@
 # playwright-service
 This is a playwright service to support simple test execution of test flows
 
+[![CI](https://github.com/ale-sanchez-g/playwright-service/actions/workflows/test.yml/badge.svg)](https://github.com/ale-sanchez-g/playwright-service/actions/workflows/test.yml)
+
 ## FastAPI Setup and Usage
 
 This project includes a simple Python API using FastAPI.
