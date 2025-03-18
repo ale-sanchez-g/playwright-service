@@ -34,7 +34,7 @@ This project includes a simple Python API using FastAPI.
 
 To run the FastAPI server, use the following command:
 ```bash
-uvicorn main:app --reload
+python service.py
 ```
 
 The server will be available at `http://127.0.0.1:8000`.
