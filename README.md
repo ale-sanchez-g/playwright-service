@@ -1,5 +1,23 @@
 # playwright-service
-This is a playwright service to support simple test execution of test flows
+A web automation service powered by Playwright that enables programmatic execution of browser-based test flows.
+    
+## Key Features
+- **Test Execution**: Run structured test plans against any website with detailed results
+- **Element Interaction**: Click, hover, type, scroll, and check element visibility
+- **Navigation**: Visit URLs and inspect page structure and elements
+- **Recording**: Capture screenshots and videos during test execution
+- **Wait Conditions**: Support for timeouts and page load states
+    
+This service provides a RESTful API to automate browser interactions for testing, monitoring, and data extraction purposes without requiring direct browser access or Playwright installation.
+    
+Use cases include:
+- Automated UI testing
+- Website monitoring
+- Content verification
+- Data extraction
+- Visual regression testing
+
+## Status
 
 [![CI](https://github.com/ale-sanchez-g/playwright-service/actions/workflows/test.yml/badge.svg)](https://github.com/ale-sanchez-g/playwright-service/actions/workflows/test.yml)
 
