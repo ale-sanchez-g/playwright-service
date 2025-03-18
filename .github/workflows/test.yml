@@ -30,7 +30,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install fastapi pytest pytest-asyncio httpx playwright
+        pip install pytest pytest-asyncio
+        pip install -r requirements.txt
     
     - name: Start App and Run tests
       run: |
