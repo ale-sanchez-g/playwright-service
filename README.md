@@ -86,3 +86,11 @@ docker-compose up
     "url": "http://example.com"
   }
   ```
+
+### How to contribute
+
+Refer to [Contribution](/contribution.md) 
+
+### Sponsors
+
+- [Devops1 Australia](https://devops1.com.au/): Helps your organisation design systems that anticipate risks, adapt to change, and deliver continuous quality.
