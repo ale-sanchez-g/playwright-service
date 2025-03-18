@@ -35,5 +35,6 @@ jobs:
     
     - name: Start App and Run tests
       run: |
-        nohup uvicorn app.main:app --host
+        nohup python service.py &
+        sleep 5
         xvfb-run pytest
