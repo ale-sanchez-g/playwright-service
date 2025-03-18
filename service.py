@@ -98,88 +98,13 @@ async def run_test(url: str, test_plan: Dict[str, Any], record_video: bool):
         
         # Process each step in the test plan
         for step_index, step in enumerate(test_plan.get("steps", [])):
-            step_result = {
-                "step": step.get("description", f"Step {step_index+1}"),
-                "success": False,
-                "details": {}
-            }
-            
-            try:
-                # Handle different action types
-                action_type = step.get("action", "").lower()
-                selector = step.get("selector", "")
-                value = step.get("value", "")
-                
-                if action_type == "click":
-                    await page.click(selector)
-                    step_result["details"]["action"] = f"Clicked on {selector}"
-                
-                elif action_type == "hover":
-                    await page.hover(selector)
-                    step_result["details"]["action"] = f"Hovered over {selector}"
-
-                elif action_type == "type":
-                    await page.fill(selector, value)
-                    step_result["details"]["action"] = f"Typed '{value}' into {selector}"
-                
-                elif action_type == "scroll":
-                    await page.evaluate(f'document.querySelector("{selector}").scrollIntoView()')
-                    step_result["details"]["action"] = f"Scrolled to {selector}"
-
-                elif action_type == "navigate":
-                    await page.goto(value)
-                    step_result["details"]["action"] = f"Navigated to {value}"
-                
-                elif action_type == "wait":
-                    wait_time = step.get("value", 3000)  # Default to 3000 ms if not specified
-                    await page.wait_for_timeout(wait_time)
-                    step_result["details"]["action"] = f"Waited for {wait_time} ms"
-                
-                elif action_type == "waitforloadstate":
-                    load_state = step.get("state", "load")  # Default to 'load' if not specified
-                    await page.wait_for_load_state(load_state)
-                    step_result["details"]["action"] = f"Waited for load state '{load_state}'"
-                
-                elif action_type == "check":
-                    is_visible = await page.is_visible(selector)
-                    step_result["details"]["action"] = f"Checked visibility of {selector}"
-                    step_result["details"]["result"] = f"Element is {'visible' if is_visible else 'not visible'}"
-                    
-                    if step.get("expect_visible", True) != is_visible:
-                        step_result["success"] = False
-                        step_result["details"]["error"] = "Visibility check failed"
-                    else:
-                        step_result["success"] = True
-                
-                elif action_type == "screenshot":
-                    screenshot_path = f"screenshot_{step_index}.png"
-                    await page.screenshot(path=screenshot_path)
-                    step_result["details"]["action"] = "Took screenshot"
-                    step_result["details"]["screenshot"] = screenshot_path
-                    results["screenshots"].append(screenshot_path)
-                
-                # Add more action types as needed
-                
-                else:
-                    step_result["details"]["error"] = f"Unknown action type: {action_type}"
-                    step_result["success"] = False
-                
-                # If we got here without an error, and it's not a check action (which sets its own success),
-                # mark the step as successful
-                if action_type != "check" and "error" not in step_result["details"]:
-                    step_result["success"] = True
-                
-            except Exception as e:
-                step_result["success"] = False
-                step_result["details"]["error"] = str(e)
-                results["success"] = False
-                results["error"] = f"Error in step {step_index+1}: {str(e)}"
-            
+            step_result = await process_step(page, step, step_index)
             results["steps"].append(step_result)
             
-            # If the step failed and it's critical, stop the test
-            if not step_result["success"] and step.get("critical", False):
-                results["error"] = f"Critical step failed: {step_result['step']}"
+            # If the step failed, mark the entire test as failed
+            if not step_result["success"]:
+                results["success"] = False
+                results["error"] = f"Step failed: {step_result['step']}"
                 break
         
         # Take a final screenshot
@@ -190,12 +115,89 @@ async def run_test(url: str, test_plan: Dict[str, Any], record_video: bool):
         # Save video path if recording was enabled
         if record_video:
             video_path = await page.video.path()
-            results["stattic/video"] = video_path
+            results["video"] = video_path
         
         # Close the browser
         await browser.close()
         
         return results
+
+async def process_step(page, step, step_index):
+    """Process a single step in the test plan."""
+    step_result = {
+        "step": step.get("description", f"Step {step_index+1}"),
+        "success": False,
+        "details": {}
+    }
+    
+    try:
+        action_type = step.get("action", "").lower()
+        selector = step.get("selector", "")
+        value = step.get("value", "")
+        
+        if action_type == "click":
+            await page.click(selector)
+            step_result["details"]["action"] = f"Clicked on {selector}"
+        
+        elif action_type == "hover":
+            await page.hover(selector)
+            step_result["details"]["action"] = f"Hovered over {selector}"
+
+        elif action_type == "type":
+            await page.fill(selector, value)
+            step_result["details"]["action"] = f"Typed '{value}' into {selector}"
+        
+        elif action_type == "scroll":
+            await page.evaluate(f'document.querySelector("{selector}").scrollIntoView()')
+            step_result["details"]["action"] = f"Scrolled to {selector}"
+
+        elif action_type == "navigate":
+            await page.goto(value)
+            step_result["details"]["action"] = f"Navigated to {value}"
+        
+        elif action_type == "wait":
+            wait_time = step.get("value", 3000)  # Default to 3000 ms if not specified
+            await page.wait_for_timeout(wait_time)
+            step_result["details"]["action"] = f"Waited for {wait_time} ms"
+        
+        elif action_type == "waitforloadstate":
+            load_state = step.get("state", "load")  # Default to 'load' if not specified
+            await page.wait_for_load_state(load_state)
+            step_result["details"]["action"] = f"Waited for load state '{load_state}'"
+        
+        elif action_type == "check":
+            is_visible = await page.is_visible(selector)
+            step_result["details"]["action"] = f"Checked visibility of {selector}"
+            step_result["details"]["result"] = f"Element is {'visible' if is_visible else 'not visible'}"
+            
+            if step.get("expect_visible", True) != is_visible:
+                step_result["success"] = False
+                step_result["details"]["error"] = "Visibility check failed"
+            else:
+                step_result["success"] = True
+        
+        elif action_type == "screenshot":
+            screenshot_path = f"screenshot_{step_index}.png"
+            await page.screenshot(path=screenshot_path)
+            step_result["details"]["action"] = "Took screenshot"
+            step_result["details"]["screenshot"] = screenshot_path
+        
+        # Add more action types as needed
+        
+        else:
+            step_result["details"]["error"] = f"Unknown action type: {action_type}"
+            step_result["success"] = False
+        
+        # If we got here without an error, and it's not a check action (which sets its own success),
+        # mark the step as successful
+        if action_type != "check" and "error" not in step_result["details"]:
+            step_result["success"] = True
+        
+    except Exception as e:
+        step_result["success"] = False
+        step_result["details"]["error"] = str(e)
+    
+    return step_result
 
 if __name__ == "__main__":
     import uvicorn

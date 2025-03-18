@@ -178,3 +178,4 @@ cython_debug/
 *.jpg
 *.jpeg
 static/videos/*.*
+pwservice/
