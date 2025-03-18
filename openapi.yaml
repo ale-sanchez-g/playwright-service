@@ -1,0 +1,131 @@
+openapi: 3.0.0
+info:
+  title: Playwright Testing Service
+  version: 1.0.0
+  description: API documentation for the Playwright Testing Service
+paths:
+  /:
+    get:
+      summary: Ensure the service is running
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /execute:
+    post:
+      summary: Execute a test plan on a website using Playwright
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestPlan'
+      responses:
+        '200':
+          description: Test execution results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  steps:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StepResult'
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                    nullable: true
+                  screenshots:
+                    type: array
+                    items:
+                      type: string
+                  video:
+                    type: string
+                    nullable: true
+        '500':
+          description: Test execution failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+  /navigate:
+    post:
+      summary: Navigate to a URL and return a map of all elements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NavigateRequest'
+      responses:
+        '200':
+          description: Navigation results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  elements:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tag:
+                          type: string
+                        class:
+                          type: string
+                        id:
+                          type: string
+                        text:
+                          type: string
+        '500':
+          description: Navigation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+components:
+  schemas:
+    TestPlan:
+      type: object
+      properties:
+        test_plan:
+          type: object
+          additionalProperties: true
+        url:
+          type: string
+        record_video:
+          type: boolean
+          default: true
+    NavigateRequest:
+      type: object
+      properties:
+        url:
+          type: string
+    StepResult:
+      type: object
+      properties:
+        step:
+          type: string
+        success:
+          type: boolean
+        details:
+          type: object
+          additionalProperties: true

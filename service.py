@@ -5,6 +5,8 @@ from typing import List, Dict, Any
 import json
 import asyncio
 from playwright.async_api import async_playwright
+from fastapi.responses import FileResponse
+from fastapi.openapi.docs import get_swagger_ui_html
 
 app = FastAPI(title="Playwright Testing Service")
 
@@ -68,6 +70,10 @@ async def navigate_to_url(request: NavigateRequest):
             return {"url": request.url, "elements": elements}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Navigation failed: {str(e)}")
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(openapi_url="/openapi.yaml", title="Playwright Testing Service")
 
 # Mount the static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
