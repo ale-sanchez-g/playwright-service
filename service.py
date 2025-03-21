@@ -181,7 +181,16 @@ async def process_step(page, step, step_index):
                 step_result["details"]["error"] = "Visibility check failed"
             else:
                 step_result["success"] = True
-        
+            
+            if value: # If there's a value, check the text content
+                element_text = await page.inner_text(selector)
+                step_result["details"]["element_text"] = element_text
+                if value not in element_text:
+                    step_result["success"] = False
+                    step_result["details"]["error"] = f"Text '{value}' not found in {selector}"
+                else:
+                    step_result["success"] = True
+
         elif action_type == "screenshot":
             screenshot_path = f"screenshot_{step_index}.png"
             await page.screenshot(path=screenshot_path)
