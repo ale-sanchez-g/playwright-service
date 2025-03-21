@@ -65,6 +65,6 @@ def test_process_step():
     response = client.post("/execute", json=test_plan)
     assert response.status_code == 200
     assert "steps" in response.json()
-    assert response.json().get("success") == true
-    assert response.json().get("error") is null
+    assert response.json().get("success") is True
+    assert response.json().get("error") is Null
 
