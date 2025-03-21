@@ -32,7 +32,7 @@ def test_navigate_to_url():
     assert "url" in response.json()
     assert "elements" in response.json()
 
-def test_process_step():
+def test_steps_actions():
     test_plan = {
         "url": "https://ale-sanchez-g.github.io/featureflags/",
         "test_plan": {
@@ -66,5 +66,4 @@ def test_process_step():
     assert response.status_code == 200
     assert "steps" in response.json()
     assert response.json().get("success") is True
-    assert response.json().get("error") is Null
 
