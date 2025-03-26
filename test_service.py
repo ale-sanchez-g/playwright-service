@@ -31,3 +31,39 @@ def test_navigate_to_url():
     assert response.status_code == 200
     assert "url" in response.json()
     assert "elements" in response.json()
+
+def test_steps_actions():
+    test_plan = {
+        "url": "https://ale-sanchez-g.github.io/featureflags/",
+        "test_plan": {
+          "description": "Validate Classic Calculator Functionality with Various Calculations",
+          "steps": [
+            {
+              "action": "navigate", "value": "https://ale-sanchez-g.github.io/featureflags/"
+            },
+            {
+              "action": "hover", "selector": "button:has-text('1')"
+            },
+            {
+              "action": "click", "selector": "button:has-text('1')"
+            },
+            {
+              "action": "click", "selector": "button:has-text('+')"
+            },
+            {
+              "action": "click", "selector": "button:has-text('1')"
+            },
+            {
+              "action": "click", "selector": "button:has-text('=')"
+            },
+            {
+              "action": "check", "selector": ".display", "value": "2"
+            }
+          ]
+        }
+      }
+    response = client.post("/execute", json=test_plan)
+    assert response.status_code == 200
+    assert "steps" in response.json()
+    assert response.json().get("success") is True
+
